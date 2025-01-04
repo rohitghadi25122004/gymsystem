@@ -1,0 +1,262 @@
+<div class="client-management-container">
+    <div class="options-container">
+        <h3>Client Management</h3>
+        <div class="options">
+            <button id="addClientBtn">Add Client</button>
+            <button id="deleteClientBtn">Delete Client</button>
+            <button id="updateClientBtn">Update Client</button>
+            <button id="viewClientsBtn">View Clients</button>
+        </div>
+    </div>
+
+    <!-- Add Client Form -->
+    <div id="addClientForm" class="form-container">
+        <h4>Add New Client</h4>
+        <form id="clientForm">
+            <div class="form-group">
+                <label for="clientName">Name</label>
+                <input type="text" id="clientName" placeholder="Enter client name" required />
+            </div>
+            <div class="form-group">
+                <label for="clientEmail">Email</label>
+                <input type="email" id="clientEmail" placeholder="Enter client email" required />
+            </div>
+            <div class="form-group">
+                <label for="clientPhone">Phone</label>
+                <input type="tel" id="clientPhone" placeholder="Enter client phone" required />
+            </div>
+            <button type="submit" class="btn btn-primary">Save Client</button>
+        </form>
+    </div>
+
+    <!-- Delete Client Selector -->
+    <div id="deleteClientSelector" class="form-container">
+        <h4>Select Client to Delete</h4>
+        <select id="clientSelectorDelete">
+            <option value="">Select a client</option>
+        </select>
+        <button id="deleteClientBtnAction" class="btn btn-danger">Delete Client</button>
+    </div>
+
+    <!-- Update Client Form -->
+    <div id="updateClientForm" class="form-container">
+        <h4>Update Client</h4>
+        <form id="updateClientForm">
+            <div class="form-group">
+                <label for="updateClientName">Name</label>
+                <input type="text" id="updateClientName" placeholder="Enter new name" required />
+            </div>
+            <div class="form-group">
+                <label for="updateClientEmail">Email</label>
+                <input type="email" id="updateClientEmail" placeholder="Enter new email" required />
+            </div>
+            <div class="form-group">
+                <label for="updateClientPhone">Phone</label>
+                <input type="tel" id="updateClientPhone" placeholder="Enter new phone" required />
+            </div>
+            <button type="submit" class="btn btn-primary">Update Client</button>
+        </form>
+    </div>
+
+    <!-- Update Client Table -->
+    <div id="updateClientTable" class="table-container">
+        <h4>Update Client</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Client ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="updateClientTableContent"></tbody>
+        </table>
+    </div>
+
+    <!-- View Clients Table -->
+    <div id="viewClientsTable" class="table-container">
+        <h4>All Clients</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Client ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                </tr>
+            </thead>
+            <tbody id="viewClientTableContent"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let clients = [];
+        let currentClientId = 1;
+
+        const addClientBtn = document.getElementById('addClientBtn');
+        const deleteClientBtn = document.getElementById('deleteClientBtn');
+        const updateClientBtn = document.getElementById('updateClientBtn');
+        const viewClientsBtn = document.getElementById('viewClientsBtn');
+        const clientForm = document.getElementById('clientForm');
+        const deleteClientBtnAction = document.getElementById('deleteClientBtnAction');
+        const clientSelectorDelete = document.getElementById('clientSelectorDelete');
+        const updateTableBody = document.getElementById('updateClientTableContent');
+        const viewTableBody = document.getElementById('viewClientTableContent');
+        const updateClientForm = document.getElementById('updateClientForm');
+
+        function showForm(formId) {
+            const forms = ['addClientForm', 'deleteClientSelector', 'updateClientTable', 'viewClientsTable', 'updateClientForm'];
+            forms.forEach(form => {
+                const element = document.getElementById(form);
+                element.style.display = (form === formId) ? 'block' : 'none';
+            });
+        }
+
+        function addClient() {
+            const name = document.getElementById('clientName').value;
+            const email = document.getElementById('clientEmail').value;
+            const phone = document.getElementById('clientPhone').value;
+
+            if (validateEmail(email) && validatePhone(phone)) {
+                clients.push({
+                    id: currentClientId++,
+                    name: name,
+                    email: email,
+                    phone: phone
+                });
+                renderClientList();
+                resetForm();
+            } else {
+                alert('Please enter valid email and phone number.');
+            }
+        }
+
+        function deleteClient(clientId) {
+            clients = clients.filter(client => client.id != clientId);
+            renderClientList();
+        }
+
+        function updateClient(clientId) {
+            const name = document.getElementById('updateClientName').value;
+            const email = document.getElementById('updateClientEmail').value;
+            const phone = document.getElementById('updateClientPhone').value;
+
+            if (validateEmail(email) && validatePhone(phone)) {
+                const clientIndex = clients.findIndex(client => client.id === clientId);
+                if (clientIndex !== -1) {
+                    clients[clientIndex].name = name;
+                    clients[clientIndex].email = email;
+                    clients[clientIndex].phone = phone;
+                    renderClientList();
+                    showForm('updateClientTable');
+                    resetForm();
+                }
+            } else {
+                alert('Please enter valid email and phone number.');
+            }
+        }
+
+        function renderClientList() {
+            updateTableBody.innerHTML = '';
+            viewTableBody.innerHTML = '';
+            clientSelectorDelete.innerHTML = '';
+
+            if (clients.length === 0) {
+                // Show a message if no clients are available
+                viewTableBody.innerHTML = ` 
+                    <tr>
+                        <td colspan="4" style="text-align: center;">No clients available</td>
+                    </tr>
+                `;
+            } else {
+                clients.forEach(client => {
+                    // Populate the View Clients Table
+                    viewTableBody.innerHTML += `
+                        <tr>
+                            <td>${client.id}</td>
+                            <td>${client.name}</td>
+                            <td>${client.email}</td>
+                            <td>${client.phone}</td>
+                        </tr>
+                    `;
+
+                    // Populate the Update Clients Table
+                    updateTableBody.innerHTML += `
+                        <tr data-client-id="${client.id}">
+                            <td>${client.id}</td>
+                            <td>${client.name}</td>
+                            <td>${client.email}</td>
+                            <td>${client.phone}</td>
+                            <td>
+                                <button class="action-btn edit" data-client-id="${client.id}">Edit</button>
+                            </td>
+                        </tr>
+                    `;
+
+                    // Populate the Delete Client Selector
+                    const option = document.createElement('option');
+                    option.value = client.id;
+                    option.textContent = `${client.name} (${client.email})`;
+                    clientSelectorDelete.appendChild(option);
+                });
+            }
+        }
+
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function validatePhone(phone) {
+            const phoneRegex = /^[0-9]{10}$/;
+            return phoneRegex.test(phone);
+        }
+
+        function resetForm() {
+            document.getElementById('clientName').value = '';
+            document.getElementById('clientEmail').value = '';
+            document.getElementById('clientPhone').value = '';
+            document.getElementById('updateClientName').value = '';
+            document.getElementById('updateClientEmail').value = '';
+            document.getElementById('updateClientPhone').value = '';
+        }
+
+        addClientBtn.addEventListener('click', () => showForm('addClientForm'));
+        deleteClientBtn.addEventListener('click', () => showForm('deleteClientSelector'));
+        updateClientBtn.addEventListener('click', () => showForm('updateClientTable'));
+        viewClientsBtn.addEventListener('click', () => showForm('viewClientsTable'));
+
+        clientForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            addClient();
+        });
+
+        deleteClientBtnAction.addEventListener('click', function() {
+            const selectedClientId = parseInt(clientSelectorDelete.value);
+            deleteClient(selectedClientId);
+        });
+
+        updateTableBody.addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('edit')) {
+                const clientId = parseInt(e.target.dataset.clientId);
+                const client = clients.find(client => client.id === clientId);
+                if (client) {
+                    document.getElementById('updateClientName').value = client.name;
+                    document.getElementById('updateClientEmail').value = client.email;
+                    document.getElementById('updateClientPhone').value = client.phone;
+                    showForm('updateClientForm');
+                    updateClientForm.onsubmit = function(event) {
+                        event.preventDefault();
+                        updateClient(clientId);
+                    };
+                }
+            }
+        });
+
+        renderClientList();
+    });
+</script>

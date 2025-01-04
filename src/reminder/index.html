@@ -1,0 +1,103 @@
+<div class="reminder-management-container">
+    <h3>Reminder Management</h3>
+    
+    <!-- Table to display reminders -->
+    <div id="viewRemindersTable" class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Amount</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="reminderTableBody">
+                <!-- Dynamic rows will be inserted here -->
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Placeholder for messages/alerts -->
+    <div id="messagePlaceholder" class="hidden"></div>
+    
+    <!-- Manual reminder send button -->
+    <div class="action-btn-container">
+        <button class="action-btn" onclick="sendAllReminders()">Send All Reminders</button>
+    </div>
+</div>
+
+<script>
+    // Sample reminder data (could be fetched from a database dynamically)
+    const reminders = [
+        { name: 'John Doe', email: 'johndoe@example.com', amount: '$50', dueDate: '2024-12-20', paid: false, cancelled: false },
+        { name: 'Jane Smith', email: 'janesmith@example.com', amount: '$60', dueDate: '2024-12-15', paid: true, cancelled: false },
+        // More records can be added dynamically
+    ];
+
+    // Function to populate the table with reminders
+    function populateReminderTable() {
+        const tableBody = document.getElementById('reminderTableBody');
+        tableBody.innerHTML = ''; // Clear existing rows
+
+        reminders.forEach((reminder, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${reminder.name}</td>
+                <td>${reminder.email}</td>
+                <td>${reminder.amount}</td>
+                <td>${reminder.dueDate}</td>
+                <td>
+                    <span class="${reminder.paid ? 'paid' : reminder.cancelled ? 'cancelled' : 'unpaid'}">
+                        ${reminder.paid ? 'Paid' : reminder.cancelled ? 'Cancelled' : 'Unpaid'}
+                    </span>
+                </td>
+                <td>
+                    <button class="action-btn" onclick="sendReminderMessage('${reminder.email}', '${reminder.dueDate}', ${index})">
+                        Send Reminder
+                    </button>
+                    <button class="action-btn" onclick="cancelPayment(${index})">
+                        Cancel Payment
+                    </button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    // Function to send a reminder message for unpaid fees
+    function sendReminderMessage(email, dueDate, index) {
+        const today = new Date();
+        const due = new Date(dueDate);
+        
+        // Check if the due date has passed and payment is not made
+        if (today > due && !reminders[index].paid && !reminders[index].cancelled) {
+            const messagePlaceholder = document.getElementById('messagePlaceholder');
+            messagePlaceholder.classList.remove('hidden');
+            messagePlaceholder.innerHTML = `Reminder sent to ${email} for unpaid fees (Due: ${dueDate})`;
+            reminders[index].cancelled = false; // Ensure cancellation is reset if reminder is sent
+            populateReminderTable(); // Update table
+        }
+    }
+
+    // Function to cancel a payment
+    function cancelPayment(index) {
+        reminders[index].cancelled = true;
+        reminders[index].paid = false;
+        populateReminderTable(); // Update table
+    }
+
+    // Function to send reminders to all unpaid users manually
+    function sendAllReminders() {
+        reminders.forEach((reminder, index) => {
+            if (!reminder.paid && !reminder.cancelled) {
+                sendReminderMessage(reminder.email, reminder.dueDate, index);
+            }
+        });
+    }
+
+    // Call the function to populate the table initially
+    populateReminderTable();
+</script>

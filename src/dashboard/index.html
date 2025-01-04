@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manish Gym Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../clientManagement/style.css">
+    <link rel="stylesheet" href="../dashboard/style.css">
+    <link rel="stylesheet" href="../reminder/style.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2 class="gym-heading">Manish Gym</h2>
+        <ul class="nav-links">
+            <li><a href="../dashboard/index.html" data-target="dashboard">Dashboard</a></li>
+            <li><a href="../clientManagement/index.html" data-target="users">Users</a></li>
+            <li><a href="../reminder/index.html" data-target="reminder">Reminder</a></li>
+            <li><a href="../business/index.html" data-target="business">Business</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <h1>Welcome Back, Manish</h1>
+            <p>Let's have some fun and get fit!</p>
+        </div>
+
+        <!-- Dynamic Content Area (This will be replaced dynamically) -->
+        <div class="dynamic-content">
+        </div>
+
+        <!-- Reminder Content Section (Will be dynamically loaded here) -->
+        <div class="reminder-content" style="display:none;">
+            <div class="reminder-details">
+                <!-- This is where reminder-specific content will appear -->
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Function to handle form display
+        function showForm(formId) {
+            const forms = ['addClientForm', 'deleteClientSelector', 'updateClientTable', 'viewClientsTable'];
+
+            forms.forEach(form => {
+                const element = document.getElementById(form);
+                if (element) {
+                    element.style.display = (form === formId) ? 'block' : 'none';
+                }
+            });
+            console.log(`Form ${formId} is displayed.`);
+        }
+
+        // Function to reapply event listeners
+        function reapplyEventListeners() {
+            const addClientButton = document.getElementById('addClientBtn');
+            if (addClientButton) {
+                addClientButton.addEventListener('click', () => showForm('addClientForm'));
+            }
+
+            const deleteClientButton = document.getElementById('deleteClientBtn');
+            if (deleteClientButton) {
+                deleteClientButton.addEventListener('click', () => showForm('deleteClientSelector'));
+            }
+
+            const updateClientButton = document.getElementById('updateClientBtn');
+            if (updateClientButton) {
+                updateClientButton.addEventListener('click', () => showForm('updateClientTable'));
+            }
+
+            const viewClientButton = document.getElementById('viewClientBtn');
+            if (viewClientButton) {
+                viewClientButton.addEventListener('click', () => showForm('viewClientsTable'));
+            }
+
+            console.log('Event listeners reapplied.');
+        }
+
+        // Add click event to each sidebar link
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', event => {
+                // Prevent default navigation
+                event.preventDefault();
+
+                // Fetch the URL and target from the clicked link
+                const target = event.target.getAttribute('data-target');
+                const url = event.target.getAttribute('href');
+
+                // Hide all content sections
+                hideAllContent();
+
+                // Load the relevant content based on the clicked link
+                if (target === 'reminder') {
+                    loadReminderContent();
+                } else {
+                    loadDynamicContent(url);
+                }
+            });
+        });
+
+        // Function to hide all content sections
+        function hideAllContent() {
+            const dynamicContent = document.querySelector('.dynamic-content');
+            const reminderContent = document.querySelector('.reminder-content');
+            dynamicContent.style.display = 'none';
+            reminderContent.style.display = 'none';
+        }
+
+        // Function to load reminder content
+        function loadReminderContent() {
+            const reminderContent = document.querySelector('.reminder-content');
+            reminderContent.style.display = 'block'; // Show the reminder content
+
+            // Fetch the reminder content from the relevant page
+            fetch('../reminder/index.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.querySelector('.reminder-details').innerHTML = data;
+                })
+                .catch(error => {
+                    console.error('Error loading reminder content:', error);
+                    document.querySelector('.reminder-details').innerHTML = 'Error loading reminder content.';
+                });
+        }
+
+        // Function to load dynamic content
+        function loadDynamicContent(url) {
+            const dynamicContent = document.querySelector('.dynamic-content');
+            dynamicContent.style.display = 'block'; // Show the dynamic content area
+
+            // Fetch the content from the clicked link's URL
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Error loading page: ${response.statusText}`);
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    const parser = new DOMParser();
+                    const htmlDoc = parser.parseFromString(data, 'text/html');
+                    const dynamicContentSection = htmlDoc.querySelector('.main-content') || htmlDoc.body;
+                    dynamicContent.innerHTML = dynamicContentSection.innerHTML;
+
+                    // Execute any <script> tags in the loaded content
+                    const scripts = dynamicContent.querySelectorAll('script');
+                    scripts.forEach(script => {
+                        const newScript = document.createElement('script');
+                        if (script.src) {
+                            newScript.src = script.src;
+                            newScript.async = true;
+                        } else {
+                            newScript.textContent = script.textContent;
+                        }
+                        document.body.appendChild(newScript);
+                        document.body.removeChild(newScript);
+                    });
+
+                    // Reapply event listeners for dynamically loaded content
+                    reapplyEventListeners();
+                })
+                .catch(error => {
+                    console.error(error);
+                    dynamicContent.innerHTML = '<p>Error loading content. Please try again later.</p>';
+                });
+        }
+    </script>
+</body>
+</html>

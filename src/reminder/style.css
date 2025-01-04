@@ -1,0 +1,207 @@
+/* General Styles */
+body {
+    margin: 0;
+    color: #6a6f8c;
+    background: #f4f4f4;
+    font: 600 1rem/1.6 'Open Sans', sans-serif;
+    line-height: 1.6;
+}
+
+*,
+*::after,
+*::before {
+    box-sizing: border-box;
+}
+
+.clearfix::after,
+.clearfix::before {
+    content: '';
+    display: table;
+}
+
+.clearfix::after {
+    clear: both;
+    display: block;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* Container */
+.reminder-management-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Header */
+h3 {
+    font-size: 1.75rem; /* Responsive font-size */
+    text-align: center;
+    margin-bottom: 2rem;
+    font-weight: 700;
+    color: #2d3e50;
+}
+
+/* Table Styles */
+.table-container {
+    display: block;
+    margin-top: 2rem;
+    padding: 2rem;
+    background-color: #fff;
+    box-shadow: 0 12px 15px rgba(0, 0, 0, 0.1), 0 17px 50px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    /* Removed overflow-x: auto; to prevent horizontal scroll */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed; /* Ensures table content does not overflow */
+}
+
+th,
+td {
+    padding: 1rem; /* Adjusted padding for responsiveness */
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    word-wrap: break-word; /* Ensures long words break to fit in the cell */
+}
+
+th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+td {
+    font-size: 0.875rem; /* Responsive font-size */
+}
+
+/* Action Button */
+button.action-btn {
+    padding: 0.625rem 1.25rem;
+    background-color: #f39c12;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button.action-btn:hover {
+    background-color: #e67e22;
+}
+
+/* Status Classes */
+.paid {
+    color: #2ecc71;
+}
+
+.unpaid {
+    color: #e74c3c;
+}
+
+.cancelled {
+    color: #95a5a6;
+}
+
+/* Manual Reminder Button */
+.action-btn-container {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+#messagePlaceholder {
+    text-align: center;
+    margin-top: 2rem;
+    font-weight: bold;
+    color: #e74c3c;
+}
+
+/* Utility Classes */
+.hidden {
+    display: none !important;
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+    .reminder-management-container {
+        padding: 1.5rem;
+    }
+
+    h3 {
+        font-size: 1.5rem;
+    }
+
+    .table-container {
+        padding: 1.5rem;
+    }
+
+    th, td {
+        padding: 0.8rem;
+    }
+
+    button.action-btn {
+        padding: 0.5rem 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        font-size: 0.9rem; /* Slightly smaller font size for mobile */
+    }
+
+    .reminder-management-container {
+        padding: 1rem;
+    }
+
+    h3 {
+        font-size: 1.25rem;
+    }
+
+    table {
+        font-size: 0.875rem;
+    }
+
+    td, th {
+        padding: 0.5rem;
+    }
+
+    button.action-btn {
+        padding: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        font-size: 0.875rem; /* Adjust font size for smaller screens */
+    }
+
+    .reminder-management-container {
+        padding: 0.75rem;
+    }
+
+    h3 {
+        font-size: 1.125rem;
+    }
+
+    .table-container {
+        padding: 1rem;
+    }
+
+    table {
+        font-size: 0.75rem; /* Smaller text for very small screens */
+    }
+
+    td, th {
+        padding: 0.4rem;
+    }
+
+    button.action-btn {
+        padding: 0.4rem 0.8rem;
+    }
+}
